@@ -18,6 +18,11 @@ interface Listing {
   status: string
   createdAt: string
   updatedAt: string
+  images?: Array<{
+    id: string
+    url: string
+    order: number
+  }>
 }
 
 export default function Dashboard() {
@@ -138,11 +143,31 @@ export default function Dashboard() {
             </div>
           ) : (
             <div className="space-y-4">
-              {listings.map((listing) => (
-                <div key={listing.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3">
-                      <div>
+              {listings.map((listing) => {
+                const primaryImage = listing.images?.find(img => img.order === 0) || listing.images?.[0]
+                
+                return (
+                  <div key={listing.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
+                    <div className="flex items-center gap-4 flex-1">
+                      {/* Property Image */}
+                      <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                        {primaryImage ? (
+                          <img
+                            src={primaryImage.url}
+                            alt={`${listing.address} property photo`}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                            <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* Property Details */}
+                      <div className="flex-1">
                         <h3 className="font-medium">{listing.address}</h3>
                         <p className="text-sm text-gray-600">{listing.suburb}, {listing.city}</p>
                         <div className="flex items-center gap-4 mt-1 text-xs text-gray-500">
@@ -152,23 +177,27 @@ export default function Dashboard() {
                             <Calendar className="h-3 w-3" />
                             {new Date(listing.createdAt).toLocaleDateString()}
                           </span>
+                          {listing.images && listing.images.length > 0 && (
+                            <span className="text-blue-600">{listing.images.length} photo{listing.images.length !== 1 ? 's' : ''}</span>
+                          )}
                         </div>
                       </div>
                     </div>
+                    
+                    <div className="flex items-center gap-3">
+                      <Badge className={getStatusColor(listing.status)}>
+                        {listing.status.replace('_', ' ').toUpperCase()}
+                      </Badge>
+                      <Link href={`/listings/${listing.id}`}>
+                        <Button variant="outline" size="sm">
+                          <Eye className="h-4 w-4 mr-1" />
+                          View
+                        </Button>
+                      </Link>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <Badge className={getStatusColor(listing.status)}>
-                      {listing.status.replace('_', ' ').toUpperCase()}
-                    </Badge>
-                    <Link href={`/listings/${listing.id}`}>
-                      <Button variant="outline" size="sm">
-                        <Eye className="h-4 w-4 mr-1" />
-                        View
-                      </Button>
-                    </Link>
-                  </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </CardContent>

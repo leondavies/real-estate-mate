@@ -30,6 +30,11 @@ interface Listing {
   variantsJson?: any
   status: string
   createdAt: string
+  images?: Array<{
+    id: string
+    url: string
+    order: number
+  }>
 }
 
 export default function ListingDetailPage() {
@@ -282,6 +287,22 @@ export default function ListingDetailPage() {
           <div className="grid lg:grid-cols-2 gap-6">
             {/* Property Facts */}
             <Card>
+              {/* Primary Image */}
+              {listing.images && listing.images.length > 0 && (
+                <div className="aspect-video w-full overflow-hidden rounded-t-lg">
+                  {(() => {
+                    const primaryImage = listing.images.find(img => img.order === 0) || listing.images[0]
+                    return (
+                      <img
+                        src={primaryImage.url}
+                        alt={`${listing.address} property photo`}
+                        className="w-full h-full object-cover"
+                      />
+                    )
+                  })()}
+                </div>
+              )}
+              
               <CardHeader>
                 <CardTitle>Property Details</CardTitle>
               </CardHeader>
