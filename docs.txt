@@ -1,0 +1,453 @@
+# AI-Powered Real Estate Copywriter (NZ Market)
+
+## 0) Product One-liner
+**“Upload property details + photos → get a Trade Me–ready listing, social posts, and flyers in seconds — all NZ-compliant and on-brand.”**
+
+Primary users: real estate agents, property managers, and private sellers.
+
+---
+
+## 1) MVP Scope (4–6 weeks)
+
+### Core use cases
+1. **Listing copy generator**
+   - Inputs: address/suburb, property type, beds/baths/parking, floor/land area, year built, CV/RV, features, school zones, notes.
+   - Output: long-form listing, concise listing, bullet highlights, multiple headlines, CTA, open home blurb.
+
+2. **Image-aware highlights (optional MVP+)**
+   - Vision captions photos for features (e.g., “north-facing deck”).
+   - User approves before copy use.
+
+3. **Social pack**
+   - IG captions, FB posts, LinkedIn/GMB snippets, hashtags.
+
+4. **Templates**
+   - Trade Me / realestate.co.nz formats.
+   - Agency brand voice presets.
+
+5. **Editor**
+   - Side-by-side: Facts vs Draft.
+   - Flags unsupported claims.
+
+6. **Exports**
+   - Markdown/HTML, JSON, A4 flyer (PDF).
+
+---
+
+## 2) Non-MVP (Phase 2)
+- Brand voice learning from past listings.
+- Optional te reo Māori enrichment.
+- A/B headline testing.
+- Multi-seat agency accounts.
+- CRM connections.
+- Advanced compliance guardrails.
+
+---
+
+## 3) Tech Stack
+
+**Frontend**
+- Next.js 14 (App Router), TypeScript  
+- TailwindCSS + shadcn/ui  
+- React Hook Form + Zod  
+
+**Backend**
+- Next.js API routes  
+- PostgreSQL (Supabase/Neon)  
+- Prisma ORM  
+- Redis (Upstash) for jobs  
+
+**AI**
+- Claude 3.5 Sonnet / GPT-4o-mini (switchable provider)  
+- Vision captioning (GPT-4o/Claude Vision)  
+- Embeddings (pgvector in Supabase)  
+
+**Infra**
+- Vercel hosting  
+- Supabase (auth, storage, Postgres)  
+- GitHub Actions, Sentry, PostHog  
+
+**Auth & Payments**
+- NextAuth  
+- Stripe (NZD, GST invoices)  
+
+---
+
+## 4) Architecture
+
+[Web app (Next.js)]
+|-- Auth (NextAuth)
+|-- Uploads (S3/Supabase storage)
+|-- Editor UI (facts vs draft)
+|-- Project state (Postgres via Prisma)
+|
++-- Jobs (Redis-backed)
+|
++-- AI Service Layer
+|-- Prompt pack (copy, headlines, social)
+|-- Vision captions
+|-- Guardrail validator
+
+css
+Copy
+Edit
+
+**LLM Provider Interface**
+```ts
+interface LLMProvider {
+  complete(params: { system: string; prompt: string; temperature?: number; maxTokens?: number }): Promise<string>;
+  vision?(params: { system: string; prompt: string; images: Array<{url:string|Buffer; mime:string}> }): Promise<string>;
+}
+5) Data Model (Prisma)
+prisma
+Copy
+Edit
+model User {
+  id            String  @id @default(cuid())
+  email         String  @unique
+  name          String?
+  agencyId      String?
+  role          String
+  createdAt     DateTime @default(now())
+  listings      Listing[]
+  brandVoices   BrandVoice[]
+  subscriptions Subscription[]
+}
+
+model Agency {
+  id        String   @id @default(cuid())
+  name      String
+  logoUrl   String?
+  brandVoiceId String?
+  users     User[]
+  createdAt DateTime @default(now())
+}
+
+model Listing {
+  id            String   @id @default(cuid())
+  userId        String
+  agencyId      String?
+  status        String
+  address       String
+  suburb        String
+  city          String
+  postcode      String?
+  propertyType  String
+  bedrooms      Int
+  bathrooms     Int
+  parking       Int?
+  floorAreaM2   Int?
+  landAreaM2    Int?
+  yearBuilt     Int?
+  cv            Int?
+  featuresJson  Json
+  notes         String?
+  factsLockJson Json
+  draftCopy     String?
+  variantsJson  Json?
+  images        Image[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Image {
+  id         String   @id @default(cuid())
+  listingId  String
+  url        String
+  metaJson   Json?
+  order      Int      @default(0)
+}
+
+model BrandVoice {
+  id          String   @id @default(cuid())
+  userId      String
+  agencyId    String?
+  name        String
+  guidelines  String
+  examples    String?
+  createdAt   DateTime @default(now())
+}
+
+model ExportPackage {
+  id          String   @id @default(cuid())
+  listingId   String
+  format      String
+  payloadJson Json?
+  fileUrl     String?
+  createdAt   DateTime @default(now())
+}
+
+model Subscription {
+  id         String   @id @default(cuid())
+  userId     String
+  plan       String
+  stripeSubId String?
+  status     String
+  createdAt  DateTime @default(now())
+}
+6) API Routes
+bash
+Copy
+Edit
+POST /api/listings
+GET  /api/listings/:id
+PATCH /api/listings/:id
+POST /api/listings/:id/images
+POST /api/listings/:id/generate
+POST /api/listings/:id/validate
+POST /api/listings/:id/export
+GET  /api/voices
+POST /api/voices
+POST /api/stripe/webhook
+7) Prompting
+System Prompt (Copy Generation)
+diff
+Copy
+Edit
+You are a New Zealand real estate copywriter.
+Rules:
+- Only use details from <FACTS>. Do NOT invent details.
+- Comply with NZ Fair Trading Act.
+- Tone: {voice.tone}. NZ English spelling.
+- Optional te reo Māori in one headline variant.
+- Provide: Long (250–400w), Standard (150–220w), Bullets (8–12), Headlines.
+User Prompt
+pgsql
+Copy
+Edit
+Generate copy for the listing using the above rules.
+Return JSON with keys: long, standard, bullets[], headlines[].
+Vision Prompt
+vbnet
+Copy
+Edit
+Caption NZ property photos for review.
+Return short phrases only.
+Guardrail Validator
+yaml
+Copy
+Edit
+Given <FACTS> and <DRAFT>, list unsupported claims and risky phrases.
+Return JSON: { unsupported: [], risky_phrases: [], suggestions: [] }
+8) Workflows
+A) Create Listing → Generate Draft
+User enters facts.
+
+Facts locked into factsLockJson.
+
+(Optional) Vision suggests features.
+
+Call generate.
+
+Save variantsJson + draftCopy.
+
+Show editor: Facts vs Draft.
+
+Run validate.
+
+B) Export
+Map to Trade Me / realestate.co.nz JSON.
+
+Generate flyer PDF.
+
+C) Brand Voice
+Upload sample listings.
+
+Few-shot prompting.
+
+9) UI/UX
+Intake form grouped by property details.
+
+Chips for features.
+
+Word count + character limits.
+
+Inline unsupported claim highlights.
+
+Export drawer.
+
+10) Validation & Guardrails
+Zod schemas for facts.
+
+Guardrail must pass before export.
+
+Forbidden phrase list.
+
+11) Testing
+Example Jest
+ts
+Copy
+Edit
+test("flags unsupported claims", async () => {
+  const facts = { bedrooms: 3, bathrooms: 1, features: ["heat pump"] };
+  const draft = "This 3-bed home with two bathrooms boasts double glazing.";
+  const res = await validateDraft(facts, draft);
+  expect(res.unsupported).toContain("two bathrooms");
+  expect(res.unsupported).toContain("double glazing");
+});
+12) Security & Compliance
+NZ Privacy Act principles.
+
+Encrypt PII, TLS in transit.
+
+Agency isolation (row-level checks).
+
+Daily DB backups.
+
+13) Pricing (NZD)
+Starter: $29/listing or $39/mo (5 listings).
+
+Pro: $99/mo unlimited.
+
+Agency: from $399/mo (multi-seat).
+
+Add-on vision: +$29/mo.
+
+Free 3-listing trial.
+
+14) Analytics
+Activation: % users draft in 10min.
+
+Time saved.
+
+Edit distance % (quality proxy).
+
+Weekly active agents.
+
+15) Project Structure
+bash
+Copy
+Edit
+/app
+  /(auth) /signin /callback
+  /dashboard
+  /listings/[id]
+  /api/listings
+  /api/listings/[id]
+  /api/listings/[id]/images
+  /api/listings/[id]/generate
+  /api/listings/[id]/validate
+  /api/listings/[id]/export
+  /api/voices
+  /api/stripe/webhook
+/components
+/lib
+  ai/
+  mappers/
+  pdf/
+/prisma
+/tests
+16) Example Mapper (Trade Me)
+ts
+Copy
+Edit
+export function mapToTradeMe(listing: Listing, variants: Variants) {
+  return {
+    title: variants.headlines[0].slice(0, 50),
+    description: variants.standard.slice(0, 3000),
+    suburb: listing.suburb,
+    region: listing.city,
+    property_type: listing.propertyType,
+    bedrooms: listing.bedrooms,
+    bathrooms: listing.bathrooms,
+    parking: listing.parking ?? 0,
+    floor_area: listing.floorAreaM2 ?? null,
+    land_area: listing.landAreaM2 ?? null,
+    features: listing.featuresJson ?? [],
+    images: listing.images.map(i => i.url),
+  };
+}
+17) Example Generate Handler
+ts
+Copy
+Edit
+export async function POST(req: NextRequest, { params }) {
+  const { id } = params;
+  const listing = await db.listing.findUnique({ where: { id }, include: { images: true }});
+  if (!listing) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+  const facts = listing.factsLockJson ?? normalizeFacts(listing);
+  const system = buildSystemPrompt(listing);
+  const user = buildUserPrompt(facts);
+
+  const draft = await llm.complete({ system, prompt: user, temperature: 0.7, maxTokens: 1200 });
+  const parsed = safeJson(draft);
+
+  await db.listing.update({ where:{ id }, data:{ variantsJson: parsed, draftCopy: parsed.standard }});
+  return NextResponse.json(parsed);
+}
+18) Facts Schema (Zod)
+ts
+Copy
+Edit
+const FactsSchema = z.object({
+  address: z.string().min(3),
+  suburb: z.string().min(2),
+  city: z.string().min(2),
+  propertyType: z.enum(["house","apartment","townhouse","unit","section"]),
+  bedrooms: z.number().int().min(0).max(15),
+  bathrooms: z.number().int().min(0).max(10),
+  parking: z.number().int().min(0).max(10).optional(),
+  floorAreaM2: z.number().int().positive().optional(),
+  landAreaM2: z.number().int().positive().optional(),
+  yearBuilt: z.number().int().min(1850).max(new Date().getFullYear()).optional(),
+  features: z.array(z.string()).optional(),
+  notes: z.string().max(2000).optional(),
+});
+19) PDF Flyer
+Header with logo & address.
+
+3–5 hero images.
+
+Highlights bullets.
+
+Standard blurb.
+
+Agent profile + contact.
+
+QR code link.
+
+20) Go-to-Market
+Pilot Christchurch agencies.
+
+TradeMe + FB groups for private sellers.
+
+Landing page with demos.
+
+Partner with photographers.
+
+Publish compliance trust page.
+
+21) Timeline
+Week 1: Repo, auth, DB, intake form.
+
+Week 2: Copy generation + guardrails.
+
+Week 3: Flyers, social pack, billing.
+
+Week 4: Testing, polish, pilot launch.
+
+22) Risks
+Vision captions unreliable → keep opt-in.
+
+Must not invent amenities.
+
+Marketplace API formats may change.
+
+LLM cost control: cache results.
+
+23) Next Steps for Claude Code
+Generate Prisma schema + migrations.
+
+Scaffold Next.js routes.
+
+Implement prompt builders.
+
+Build editor UI (facts vs draft).
+
+Add marketplace mappers.
+
+Write validator tests.
+
+Create PDF flyer component.
+
