@@ -93,7 +93,7 @@ export async function analyzeAllImages(imageUrls: string[]): Promise<VisionAnaly
 export function consolidateFeatures(analyses: VisionAnalysis[]): string[] {
   const allFeatures = analyses.flatMap(analysis => analysis.features)
   // Remove duplicates and return unique features
-  return [...new Set(allFeatures)]
+  return Array.from(new Set(allFeatures))
 }
 
 export function generateImageBasedCopy(analyses: VisionAnalysis[]): string {

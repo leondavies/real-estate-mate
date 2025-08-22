@@ -159,6 +159,7 @@ export default function ListingDetailPage() {
     }
   }
 
+
   if (error) {
     return (
       <div className="container mx-auto py-8 px-4">
@@ -261,7 +262,7 @@ export default function ListingDetailPage() {
               setListing(prev => {
                 if (!prev) return null
                 const currentFeatures = prev.featuresJson || []
-                const newFeatures = [...new Set([...currentFeatures, ...features])]
+                const newFeatures = Array.from(new Set([...currentFeatures, ...features]))
                 return {...prev, featuresJson: newFeatures}
               })
             }}
@@ -379,6 +380,7 @@ export default function ListingDetailPage() {
                     <p className="text-sm mt-1 text-gray-600">{listing.notes}</p>
                   </div>
                 )}
+
               </CardContent>
             </Card>
 
@@ -402,12 +404,24 @@ export default function ListingDetailPage() {
                   </div>
 
                   {/* Standard Copy */}
-                  <div>
-                    <h4 className="font-medium mb-2">Standard Copy</h4>
-                    <div className="p-4 bg-gray-50 rounded">
-                      <p className="text-sm">{listing.variantsJson.standard}</p>
+                  {listing.variantsJson.standard && (
+                    <div>
+                      <h4 className="font-medium mb-2">Standard Description (220 chars)</h4>
+                      <div className="p-4 bg-green-50 rounded">
+                        <p className="text-sm">{listing.variantsJson.standard}</p>
+                      </div>
                     </div>
-                  </div>
+                  )}
+
+                  {/* Long Copy */}
+                  {listing.variantsJson.long && (
+                    <div>
+                      <h4 className="font-medium mb-2">Long Description (400 chars)</h4>
+                      <div className="p-4 bg-purple-50 rounded">
+                        <p className="text-sm">{listing.variantsJson.long}</p>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Bullet Points */}
                   <div>

@@ -38,7 +38,6 @@ export async function POST(req: NextRequest) {
         data: {
           email: session.user.email,
           name: session.user.name || "",
-          image: session.user.image,
           role: "agent",
         },
       })

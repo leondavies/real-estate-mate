@@ -58,10 +58,10 @@ export async function POST(
     console.log("Detected features:", detectedFeatures)
 
     // Get current features from listing
-    const currentFeatures = listing.featuresJson || []
+    const currentFeatures = Array.isArray(listing.featuresJson) ? listing.featuresJson : []
     
     // Merge detected features with existing ones (avoid duplicates)
-    const mergedFeatures = [...new Set([...currentFeatures, ...detectedFeatures])]
+    const mergedFeatures = Array.from(new Set([...currentFeatures, ...detectedFeatures]))
 
     // Update listing with new features
     const updatedListing = await db.listing.update({

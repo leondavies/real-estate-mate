@@ -42,8 +42,10 @@ export const authOptions: NextAuthOptions = {
             where: { email: session.user.email },
           })
           if (dbUser) {
-            (session.user as any).id = dbUser.id
-            (session.user as any).role = dbUser.role
+            Object.assign(session.user, {
+              id: dbUser.id,
+              role: dbUser.role
+            })
           }
         } catch (error) {
           console.error("Error fetching user:", error)

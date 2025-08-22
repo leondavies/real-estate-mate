@@ -100,7 +100,8 @@ export function ExportModal({ listing, variants, onClose }: ExportModalProps) {
 
   const renderTradeMe = () => {
     const title = variants.headlines?.[0] || `${listing.bedrooms} bed ${listing.propertyType} in ${listing.suburb}`
-    const description = variants.standard
+    const standardDescription = variants.standard
+    const longDescription = variants.long
 
     return (
       <div className="space-y-4">
@@ -132,24 +133,47 @@ export function ExportModal({ listing, variants, onClose }: ExportModalProps) {
             />
           </div>
 
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="font-medium text-sm">Property Description</span>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => copyToClipboard(description)}
-              >
-                <Copy className="h-3 w-3 mr-1" />
-                Copy
-              </Button>
+          {standardDescription && (
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-medium text-sm">Standard Description (220 chars)</span>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => copyToClipboard(standardDescription)}
+                >
+                  <Copy className="h-3 w-3 mr-1" />
+                  Copy
+                </Button>
+              </div>
+              <Textarea
+                value={standardDescription}
+                readOnly
+                className="min-h-[120px] text-sm"
+              />
             </div>
-            <Textarea
-              value={description}
-              readOnly
-              className="min-h-[120px] text-sm"
-            />
-          </div>
+          )}
+
+          {longDescription && (
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-medium text-sm">Long Description (400 chars)</span>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => copyToClipboard(longDescription)}
+                >
+                  <Copy className="h-3 w-3 mr-1" />
+                  Copy
+                </Button>
+              </div>
+              <Textarea
+                value={longDescription}
+                readOnly
+                className="min-h-[140px] text-sm"
+              />
+            </div>
+          )}
 
           {variants.bullets && variants.bullets.length > 0 && (
             <div>
@@ -313,11 +337,18 @@ export function ExportModal({ listing, variants, onClose }: ExportModalProps) {
   }
 
   const renderCopy = () => {
-    const cleanText = `${variants.headlines?.[0] || `${listing.bedrooms} bed ${listing.propertyType} in ${listing.suburb}`}
-
+    const standardText = variants.standard ? `Standard Description (220 chars):
 ${variants.standard}
 
-Key Features:
+` : ''
+    const longText = variants.long ? `Long Description (400 chars):
+${variants.long}
+
+` : ''
+    
+    const cleanText = `${variants.headlines?.[0] || `${listing.bedrooms} bed ${listing.propertyType} in ${listing.suburb}`}
+
+${standardText}${longText}Key Features:
 ${variants.bullets ? variants.bullets.map((bullet: string) => `• ${bullet}`).join('\n') : 'No features listed'}
 
 Property Details:
