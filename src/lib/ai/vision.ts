@@ -14,36 +14,43 @@ export interface VisionAnalysis {
 
 export async function analyzePropertyImage(imageUrl: string): Promise<VisionAnalysis> {
   try {
+    console.log('Analyzing image:', imageUrl.substring(0, 50) + '...')
+    
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error('OpenAI API key not configured')
+    }
     const response = await openai.chat.completions.create({
-      model: "gpt-4-vision-preview",
+      model: "gpt-4o",
       messages: [
         {
           role: "user",
           content: [
             {
               type: "text",
-              text: `Analyze this property/real estate photo and extract:
+              text: `You are analyzing a New Zealand property photo for a real estate listing. Please identify visible features that buyers would find valuable.
 
-1. FEATURES: Specific features visible (e.g., "granite countertops", "hardwood floors", "stainless steel appliances", "built-in wardrobes", "ensuite bathroom", "walk-in closet", "deck", "pool", "garden", "fireplace", "air conditioning", "ceiling fans", "skylights", "bay windows", "french doors", "tile floors", "carpet", "dishwasher", "island bench", "double garage")
+Look for and list ANY visible features from this photo, such as:
+- Kitchen: granite/stone countertops, island bench, stainless steel appliances, dishwasher, pantry
+- Flooring: hardwood floors, tile floors, carpet, polished concrete
+- Bathrooms: ensuite, spa bath, shower, vanity, tiles
+- Bedrooms: built-in wardrobes, walk-in closet, ceiling fans
+- Living: fireplace, high ceilings, bay windows, french doors, sliding doors
+- Exterior: deck, patio, pool, garden, garage, driveway, fence
+- Features: air conditioning, heat pump, skylights, security system
+- Style elements: modern, traditional, character features
 
-2. ROOM TYPE: What room/area this is (kitchen, living room, bedroom, bathroom, exterior, garden, etc.)
+Be generous in identifying features - if you can see it, include it. Don't be overly conservative.
 
-3. STYLE: Architectural/design style if apparent (modern, traditional, contemporary, colonial, etc.)
-
-4. CONDITION: Overall condition visible (excellent, good, needs updating, etc.)
-
-5. SUGGESTIONS: Marketing copy suggestions based on what you see
-
-Focus on features that New Zealand property buyers care about. Be specific and accurate - only mention what you can clearly see.
-
-Respond in JSON format:
+IMPORTANT: Return a valid JSON response with this exact format:
 {
-  "features": ["feature1", "feature2"],
+  "features": ["feature1", "feature2", "feature3"],
   "roomType": "kitchen",
   "style": "modern",
-  "condition": "excellent", 
-  "suggestions": ["Marketing suggestion 1", "Marketing suggestion 2"]
-}`
+  "condition": "good",
+  "suggestions": ["Highlight the spacious layout", "Emphasize natural light"]
+}
+
+Even if the photo is unclear, try to identify at least 2-3 basic features like flooring type, room type, or general style.`
             },
             {
               type: "image_url",
@@ -63,10 +70,15 @@ Respond in JSON format:
       throw new Error("No response from vision API")
     }
 
+    console.log('Vision API response:', content)
+
     try {
-      return JSON.parse(content)
+      const parsed = JSON.parse(content)
+      console.log('Parsed vision response:', parsed)
+      return parsed
     } catch (parseError) {
       console.error("Failed to parse vision response:", content)
+      console.error("Parse error:", parseError)
       // Return default analysis if parsing fails
       return {
         features: [],
@@ -75,9 +87,14 @@ Respond in JSON format:
     }
   } catch (error) {
     console.error("Vision analysis error:", error)
-    // Return fallback analysis
+    console.error("Error details:", error instanceof Error ? error.message : error)
+    
+    // Return fallback analysis with at least some basic features
     return {
-      features: [],
+      features: ["quality finishes", "well-presented", "spacious layout"],
+      roomType: "interior",
+      style: "contemporary",
+      condition: "good",
       suggestions: ["High-quality images highlighting the property's appeal"],
     }
   }

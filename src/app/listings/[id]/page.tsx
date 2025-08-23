@@ -9,7 +9,8 @@ import { Badge } from "@/components/ui/badge"
 import { ListingEditor } from "@/components/listing/listing-editor"
 import { ExportModal } from "@/components/listing/export-modal"
 import { ImageUpload } from "@/components/listing/image-upload"
-import { Sparkles, Download, Share, AlertTriangle, Edit, Image as ImageIcon, Save, CheckCircle, ArrowLeft } from "lucide-react"
+import { ComplianceResults } from "@/components/listing/compliance-results"
+import { Sparkles, Download, Share, AlertTriangle, Edit, Image as ImageIcon, Save, CheckCircle, ArrowLeft, Shield, Loader2 } from "lucide-react"
 
 interface Listing {
   id: string
@@ -47,6 +48,9 @@ export default function ListingDetailPage() {
   const [showExportModal, setShowExportModal] = useState(false)
   const [showImages, setShowImages] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  const [validationResult, setValidationResult] = useState<any>(null)
+  const [isValidating, setIsValidating] = useState(false)
+  const [showComplianceResults, setShowComplianceResults] = useState(false)
 
   useEffect(() => {
     if (params.id) {
@@ -159,6 +163,29 @@ export default function ListingDetailPage() {
     }
   }
 
+  const validateCompliance = async () => {
+    if (!listing) return
+
+    setIsValidating(true)
+    try {
+      const response = await fetch(`/api/listings/${listing.id}/validate`, {
+        method: "POST",
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to validate listing")
+      }
+
+      const result = await response.json()
+      setValidationResult(result)
+      setShowComplianceResults(true)
+    } catch (error) {
+      console.error("Error validating compliance:", error)
+      alert("Failed to validate compliance. Please try again.")
+    } finally {
+      setIsValidating(false)
+    }
+  }
 
   if (error) {
     return (
@@ -195,48 +222,29 @@ export default function ListingDetailPage() {
         </Link>
 
         {/* Header */}
-        <div className="flex justify-between items-start">
-          <div>
-            <h1 className="text-3xl font-bold">{listing.address}</h1>
-            <p className="text-gray-600 text-lg">{listing.suburb}, {listing.city}</p>
-            <Badge variant={listing.status === "draft_ready" ? "default" : "secondary"} className="mt-2">
-              {listing.status.replace("_", " ").toUpperCase()}
-            </Badge>
-          </div>
-          <div className="flex gap-2">
-            {!listing.variantsJson ? (
-              <Button onClick={generateCopy} disabled={isGenerating}>
-                <Sparkles className="mr-2 h-4 w-4" />
-                {isGenerating ? "Generating..." : "Generate Copy"}
-              </Button>
-            ) : (
-              <>
-                <Button 
-                  variant={showImages ? 'default' : 'outline'}
-                  onClick={() => setShowImages(!showImages)}
-                >
-                  <ImageIcon className="mr-2 h-4 w-4" />
-                  {showImages ? 'Hide Images' : 'Manage Images'}
-                </Button>
-                <Button 
-                  variant={viewMode === 'edit' ? 'default' : 'outline'}
-                  onClick={() => setViewMode(viewMode === 'edit' ? 'view' : 'edit')}
-                >
-                  <Edit className="mr-2 h-4 w-4" />
-                  {viewMode === 'edit' ? 'View Mode' : 'Edit Mode'}
-                </Button>
-                <Button variant="outline" onClick={() => setShowExportModal(true)}>
-                  <Share className="mr-2 h-4 w-4" />
-                  Export
-                </Button>
-                <Button onClick={generateCopy} disabled={isGenerating}>
+        <div className="space-y-4">
+          <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4">
+            <div>
+              <h1 className="text-3xl font-bold">{listing.address}</h1>
+              <p className="text-gray-600 text-lg">{listing.suburb}, {listing.city}</p>
+              <Badge variant={listing.status === "draft_ready" ? "default" : "secondary"} className="mt-2">
+                {listing.status.replace("_", " ").toUpperCase()}
+              </Badge>
+            </div>
+            
+            {/* Primary Action - Generate/Publish */}
+            <div className="flex flex-wrap gap-2">
+              {!listing.variantsJson ? (
+                <Button onClick={generateCopy} disabled={isGenerating} size="lg" className="bg-blue-600 hover:bg-blue-700">
                   <Sparkles className="mr-2 h-4 w-4" />
-                  Regenerate
+                  {isGenerating ? "Generating..." : "Generate Copy"}
                 </Button>
-                {listing.status !== "published" && (
+              ) : (
+                listing.status !== "published" && (
                   <Button 
                     onClick={publishListing} 
                     disabled={isSaving}
+                    size="lg"
                     className="bg-green-600 hover:bg-green-700"
                   >
                     {listing.status === "published" ? (
@@ -246,10 +254,83 @@ export default function ListingDetailPage() {
                     )}
                     {isSaving ? "Publishing..." : listing.status === "published" ? "Published" : "Save & Publish"}
                   </Button>
-                )}
-              </>
-            )}
+                )
+              )}
+            </div>
           </div>
+
+          {/* Secondary Actions - Only show when content exists */}
+          {listing.variantsJson && (
+            <div className="border-t pt-4">
+              <div className="flex flex-wrap gap-3">
+                {/* View/Edit Toggle Group */}
+                <div className="flex rounded-lg border overflow-hidden">
+                  <Button 
+                    variant={viewMode === 'view' ? 'default' : 'ghost'}
+                    onClick={() => setViewMode('view')}
+                    className="rounded-none border-r"
+                    size="sm"
+                  >
+                    View
+                  </Button>
+                  <Button 
+                    variant={viewMode === 'edit' ? 'default' : 'ghost'}
+                    onClick={() => setViewMode('edit')}
+                    className="rounded-none"
+                    size="sm"
+                  >
+                    <Edit className="mr-1 h-3 w-3" />
+                    Edit
+                  </Button>
+                </div>
+
+                {/* Content Management */}
+                <Button 
+                  variant={showImages ? 'default' : 'outline'}
+                  onClick={() => setShowImages(!showImages)}
+                  size="sm"
+                >
+                  <ImageIcon className="mr-2 h-4 w-4" />
+                  {showImages ? 'Hide Images' : 'Images'}
+                </Button>
+
+                <Button 
+                  onClick={generateCopy} 
+                  disabled={isGenerating}
+                  variant="outline"
+                  size="sm"
+                >
+                  <Sparkles className="mr-2 h-4 w-4" />
+                  Regenerate
+                </Button>
+
+                {/* Validation & Export */}
+                <Button 
+                  variant="outline" 
+                  onClick={validateCompliance} 
+                  disabled={isValidating}
+                  size="sm"
+                  className={validationResult?.compliance?.isCompliant ? 'border-green-500 text-green-700 bg-green-50' : validationResult ? 'border-red-500 text-red-700 bg-red-50' : ''}
+                >
+                  {isValidating ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Shield className="mr-2 h-4 w-4" />
+                  )}
+                  Compliance
+                </Button>
+
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowExportModal(true)}
+                  size="sm"
+                >
+                  <Share className="mr-2 h-4 w-4" />
+                  Export
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
 
         {showImages && (
@@ -462,6 +543,14 @@ export default function ListingDetailPage() {
             listing={listing}
             variants={listing.variantsJson}
             onClose={() => setShowExportModal(false)}
+          />
+        )}
+
+        {/* Compliance Results Modal */}
+        {showComplianceResults && validationResult && (
+          <ComplianceResults
+            result={validationResult}
+            onClose={() => setShowComplianceResults(false)}
           />
         )}
       </div>

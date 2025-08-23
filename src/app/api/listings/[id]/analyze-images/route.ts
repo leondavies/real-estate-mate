@@ -48,14 +48,18 @@ export async function POST(
 
     // Extract image URLs (they're stored as base64 data URLs)
     const imageUrls = listing.images.map(img => img.url)
+    console.log("Image URLs (first 100 chars):", imageUrls.map(url => url.substring(0, 100)))
 
     // Analyze all images
+    console.log("Starting image analysis...")
     const analyses = await analyzeAllImages(imageUrls)
+    console.log("Analysis complete, results:", analyses)
     
     // Consolidate features from all images
     const detectedFeatures = consolidateFeatures(analyses)
     
     console.log("Detected features:", detectedFeatures)
+    console.log("Total detected features:", detectedFeatures.length)
 
     // Get current features from listing
     const currentFeatures = Array.isArray(listing.featuresJson) ? listing.featuresJson : []
