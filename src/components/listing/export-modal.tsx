@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
@@ -23,41 +23,49 @@ export function ExportModal({ listing, variants, onClose }: ExportModalProps) {
   const [activeFormat, setActiveFormat] = useState<'trademe' | 'realestate' | 'social' | 'copy' | 'pdf'>('trademe')
   const [generatingPdf, setGeneratingPdf] = useState(false)
 
+  // Prevent body scrolling when modal is open
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
+  }, [])
+
   const exportFormats = [
     {
       id: 'trademe' as const,
       name: 'Trade Me',
       icon: <Globe className="h-4 w-4" />,
       description: 'Copy-ready content for Trade Me listings',
-      color: 'bg-green-100 text-green-800'
+      color: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
     },
     {
       id: 'realestate' as const,
       name: 'realestate.co.nz',
       icon: <Globe className="h-4 w-4" />,
       description: 'Formatted copy for realestate.co.nz',
-      color: 'bg-blue-100 text-blue-800'
+      color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
     },
     {
       id: 'social' as const,
       name: 'Social Media',
       icon: <Share2 className="h-4 w-4" />,
       description: 'Ready-to-post social content',
-      color: 'bg-purple-100 text-purple-800'
+      color: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300'
     },
     {
       id: 'copy' as const,
       name: 'Print & Email',
       icon: <FileText className="h-4 w-4" />,
       description: 'Clean text for flyers and emails',
-      color: 'bg-gray-100 text-gray-800'
+      color: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
     },
     {
       id: 'pdf' as const,
       name: 'PDF Flyer',
       icon: <Download className="h-4 w-4" />,
       description: 'Professional PDF flyer with images',
-      color: 'bg-orange-100 text-orange-800'
+      color: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300'
     }
   ]
 
@@ -105,18 +113,18 @@ export function ExportModal({ listing, variants, onClose }: ExportModalProps) {
 
     return (
       <div className="space-y-4">
-        <div className="bg-green-50 p-4 rounded-lg">
-          <h4 className="font-medium text-green-800 mb-2 flex items-center gap-2">
+        <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-lg">
+          <h4 className="font-medium text-green-800 dark:text-green-300 mb-2 flex items-center gap-2">
             <Globe className="h-4 w-4" />
             Trade Me Ready Copy
           </h4>
-          <p className="text-sm text-green-700 mb-3">Copy and paste these sections into your Trade Me listing:</p>
+          <p className="text-sm text-green-700 dark:text-green-400 mb-3">Copy and paste these sections into your Trade Me listing:</p>
         </div>
 
         <div className="space-y-4">
           <div>
             <div className="flex items-center justify-between mb-2">
-              <span className="font-medium text-sm">Listing Title</span>
+              <span className="font-medium text-sm text-gray-900 dark:text-white">Listing Title</span>
               <Button
                 size="sm"
                 variant="outline"
@@ -136,7 +144,7 @@ export function ExportModal({ listing, variants, onClose }: ExportModalProps) {
           {standardDescription && (
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="font-medium text-sm">Standard Description (220 chars)</span>
+                <span className="font-medium text-sm text-gray-900 dark:text-white">Standard Description (220 chars)</span>
                 <Button
                   size="sm"
                   variant="outline"
@@ -157,7 +165,7 @@ export function ExportModal({ listing, variants, onClose }: ExportModalProps) {
           {longDescription && (
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="font-medium text-sm">Long Description (400 chars)</span>
+                <span className="font-medium text-sm text-gray-900 dark:text-white">Long Description (400 chars)</span>
                 <Button
                   size="sm"
                   variant="outline"
@@ -178,7 +186,7 @@ export function ExportModal({ listing, variants, onClose }: ExportModalProps) {
           {variants.bullets && variants.bullets.length > 0 && (
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="font-medium text-sm">Key Features (Bullet Points)</span>
+                <span className="font-medium text-sm text-gray-900 dark:text-white">Key Features (Bullet Points)</span>
                 <Button
                   size="sm"
                   variant="outline"
@@ -206,18 +214,18 @@ export function ExportModal({ listing, variants, onClose }: ExportModalProps) {
 
     return (
       <div className="space-y-4">
-        <div className="bg-blue-50 p-4 rounded-lg">
-          <h4 className="font-medium text-blue-800 mb-2 flex items-center gap-2">
+        <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg">
+          <h4 className="font-medium text-blue-800 dark:text-blue-300 mb-2 flex items-center gap-2">
             <Globe className="h-4 w-4" />
             realestate.co.nz Ready Copy
           </h4>
-          <p className="text-sm text-blue-700 mb-3">Optimized formatting for realestate.co.nz listings:</p>
+          <p className="text-sm text-blue-700 dark:text-blue-400 mb-3">Optimized formatting for realestate.co.nz listings:</p>
         </div>
 
         <div className="space-y-4">
           <div>
             <div className="flex items-center justify-between mb-2">
-              <span className="font-medium text-sm">Property Headline</span>
+              <span className="font-medium text-sm text-gray-900 dark:text-white">Property Headline</span>
               <Button
                 size="sm"
                 variant="outline"
@@ -236,7 +244,7 @@ export function ExportModal({ listing, variants, onClose }: ExportModalProps) {
 
           <div>
             <div className="flex items-center justify-between mb-2">
-              <span className="font-medium text-sm">Detailed Description</span>
+              <span className="font-medium text-sm text-gray-900 dark:text-white">Detailed Description</span>
               <Button
                 size="sm"
                 variant="outline"
@@ -260,19 +268,19 @@ export function ExportModal({ listing, variants, onClose }: ExportModalProps) {
   const renderSocial = () => {
     return (
       <div className="space-y-4">
-        <div className="bg-purple-50 p-4 rounded-lg">
-          <h4 className="font-medium text-purple-800 mb-2 flex items-center gap-2">
+        <div className="bg-purple-50 dark:bg-purple-900/30 p-4 rounded-lg">
+          <h4 className="font-medium text-purple-800 dark:text-purple-300 mb-2 flex items-center gap-2">
             <Share2 className="h-4 w-4" />
             Social Media Posts
           </h4>
-          <p className="text-sm text-purple-700 mb-3">Ready-to-post content for social platforms:</p>
+          <p className="text-sm text-purple-700 dark:text-purple-400 mb-3">Ready-to-post content for social platforms:</p>
         </div>
 
         <div className="space-y-4">
           {variants.social?.facebook && (
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="font-medium text-sm">Facebook Post</span>
+                <span className="font-medium text-sm text-gray-900 dark:text-white">Facebook Post</span>
                 <Button
                   size="sm"
                   variant="outline"
@@ -293,7 +301,7 @@ export function ExportModal({ listing, variants, onClose }: ExportModalProps) {
           {variants.social?.instagram && (
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="font-medium text-sm">Instagram Caption</span>
+                <span className="font-medium text-sm text-gray-900 dark:text-white">Instagram Caption</span>
                 <Button
                   size="sm"
                   variant="outline"
@@ -314,7 +322,7 @@ export function ExportModal({ listing, variants, onClose }: ExportModalProps) {
           {variants.social?.linkedin && (
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="font-medium text-sm">LinkedIn Post</span>
+                <span className="font-medium text-sm text-gray-900 dark:text-white">LinkedIn Post</span>
                 <Button
                   size="sm"
                   variant="outline"
@@ -362,17 +370,17 @@ Location: ${listing.address}, ${listing.suburb}, ${listing.city}`
 
     return (
       <div className="space-y-4">
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <h4 className="font-medium text-gray-800 mb-2 flex items-center gap-2">
+        <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+          <h4 className="font-medium text-gray-800 dark:text-gray-200 mb-2 flex items-center gap-2">
             <FileText className="h-4 w-4" />
             Clean Text Format
           </h4>
-          <p className="text-sm text-gray-700 mb-3">Perfect for email signatures, flyers, and general use:</p>
+          <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">Perfect for email signatures, flyers, and general use:</p>
         </div>
 
         <div>
           <div className="flex items-center justify-between mb-2">
-            <span className="font-medium text-sm">Complete Listing Text</span>
+            <span className="font-medium text-sm text-gray-900 dark:text-white">Complete Listing Text</span>
             <Button
               size="sm"
               variant="outline"
@@ -395,18 +403,18 @@ Location: ${listing.address}, ${listing.suburb}, ${listing.city}`
   const renderPdf = () => {
     return (
       <div className="space-y-4">
-        <div className="bg-orange-50 p-4 rounded-lg">
-          <h4 className="font-medium text-orange-800 mb-2 flex items-center gap-2">
+        <div className="bg-orange-50 dark:bg-orange-900/30 p-4 rounded-lg">
+          <h4 className="font-medium text-orange-800 dark:text-orange-300 mb-2 flex items-center gap-2">
             <Download className="h-4 w-4" />
             Professional PDF Flyer
           </h4>
-          <p className="text-sm text-orange-700 mb-3">Generate a professional PDF flyer with your property images and details:</p>
+          <p className="text-sm text-orange-700 dark:text-orange-400 mb-3">Generate a professional PDF flyer with your property images and details:</p>
         </div>
 
         <div className="space-y-4">
-          <div className="bg-white border rounded-lg p-6">
-            <h5 className="font-medium mb-3">What's included in your flyer:</h5>
-            <ul className="space-y-2 text-sm text-gray-600">
+          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg p-6">
+            <h5 className="font-medium mb-3 text-gray-900 dark:text-white">What's included in your flyer:</h5>
+            <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
               <li className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
                 Property headline and description
@@ -449,7 +457,7 @@ Location: ${listing.address}, ${listing.suburb}, ${listing.city}`
             )}
           </Button>
 
-          <p className="text-xs text-gray-500 text-center">
+          <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
             PDF will be automatically downloaded to your device
           </p>
         </div>
@@ -475,13 +483,13 @@ Location: ${listing.address}, ${listing.suburb}, ${listing.city}`
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden">
-        <div className="p-6 border-b">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-lg max-w-4xl w-full max-h-[90vh] flex flex-col">
+        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex justify-between items-center">
             <div>
-              <h2 className="text-2xl font-bold">Export Listing</h2>
-              <p className="text-gray-600">{listing.address}, {listing.suburb}</p>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Export Listing</h2>
+              <p className="text-gray-600 dark:text-gray-300">{listing.address}, {listing.suburb}</p>
             </div>
             <Button variant="outline" onClick={onClose}>
               Close
@@ -489,10 +497,10 @@ Location: ${listing.address}, ${listing.suburb}, ${listing.city}`
           </div>
         </div>
 
-        <div className="flex">
+        <div className="flex flex-1 overflow-hidden">
           {/* Format Selection */}
-          <div className="w-64 border-r bg-gray-50 p-4">
-            <h3 className="font-medium mb-3">Export Format</h3>
+          <div className="w-64 border-r border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-4 overflow-y-auto">
+            <h3 className="font-medium mb-3 text-gray-900 dark:text-white">Export Format</h3>
             <div className="space-y-2">
               {exportFormats.map((format) => (
                 <button
@@ -500,15 +508,15 @@ Location: ${listing.address}, ${listing.suburb}, ${listing.city}`
                   onClick={() => setActiveFormat(format.id)}
                   className={`w-full text-left p-3 rounded-lg border transition-colors ${
                     activeFormat === format.id
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-200 hover:bg-gray-100'
+                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30'
+                      : 'border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700'
                   }`}
                 >
                   <div className="flex items-center gap-2 mb-1">
                     {format.icon}
-                    <span className="font-medium">{format.name}</span>
+                    <span className="font-medium text-gray-900 dark:text-white">{format.name}</span>
                   </div>
-                  <p className="text-xs text-gray-600">{format.description}</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">{format.description}</p>
                   <Badge className={`mt-1 ${format.color}`} variant="secondary">
                     Ready
                   </Badge>
@@ -518,7 +526,7 @@ Location: ${listing.address}, ${listing.suburb}, ${listing.city}`
           </div>
 
           {/* Content Area */}
-          <div className="flex-1 p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+          <div className="flex-1 p-6 overflow-y-auto">
             {renderContent()}
           </div>
         </div>

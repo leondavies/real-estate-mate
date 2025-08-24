@@ -204,14 +204,14 @@ export default function ListingDetailPage() {
       <div className="container mx-auto py-8 px-4">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading listing...</p>
+          <p className="mt-4 text-gray-600 dark:text-gray-300">Loading listing...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div className="container mx-auto py-8 px-4 min-h-screen bg-white dark:bg-gray-900">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Back button */}
         <Link href="/dashboard">
@@ -225,8 +225,8 @@ export default function ListingDetailPage() {
         <div className="space-y-4">
           <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4">
             <div>
-              <h1 className="text-3xl font-bold">{listing.address}</h1>
-              <p className="text-gray-600 text-lg">{listing.suburb}, {listing.city}</p>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{listing.address}</h1>
+              <p className="text-gray-600 dark:text-gray-300 text-lg">{listing.suburb}, {listing.city}</p>
               <Badge variant={listing.status === "draft_ready" ? "default" : "secondary"} className="mt-2">
                 {listing.status.replace("_", " ").toUpperCase()}
               </Badge>
@@ -354,8 +354,8 @@ export default function ListingDetailPage() {
           <Card>
             <CardContent className="text-center py-12">
               <Sparkles className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p className="text-gray-500 text-lg">No copy generated yet</p>
-              <p className="text-sm mt-2 text-gray-400">Click "Generate Copy" to create AI-powered listing content</p>
+              <p className="text-gray-500 dark:text-gray-400 text-lg">No copy generated yet</p>
+              <p className="text-sm mt-2 text-gray-400 dark:text-gray-500">Click "Generate Copy" to create AI-powered listing content</p>
             </CardContent>
           </Card>
         ) : viewMode === 'edit' ? (
@@ -386,25 +386,25 @@ export default function ListingDetailPage() {
               )}
               
               <CardHeader>
-                <CardTitle>Property Details</CardTitle>
+                <CardTitle className="text-gray-900 dark:text-white">Property Details</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <span className="text-sm font-medium text-gray-500">Type</span>
-                    <p className="text-lg capitalize">{listing.propertyType}</p>
+                    <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Type</span>
+                    <p className="text-lg capitalize text-gray-900 dark:text-white">{listing.propertyType}</p>
                   </div>
                   <div>
-                    <span className="text-sm font-medium text-gray-500">Bedrooms</span>
-                    <p className="text-lg">{listing.bedrooms}</p>
+                    <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Bedrooms</span>
+                    <p className="text-lg text-gray-900 dark:text-white">{listing.bedrooms}</p>
                   </div>
                   <div>
-                    <span className="text-sm font-medium text-gray-500">Bathrooms</span>
-                    <p className="text-lg">{listing.bathrooms}</p>
+                    <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Bathrooms</span>
+                    <p className="text-lg text-gray-900 dark:text-white">{listing.bathrooms}</p>
                   </div>
                   <div>
-                    <span className="text-sm font-medium text-gray-500">Parking</span>
-                    <p className="text-lg">{listing.parking || "N/A"}</p>
+                    <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Parking</span>
+                    <p className="text-lg text-gray-900 dark:text-white">{listing.parking || "N/A"}</p>
                   </div>
                 </div>
 
@@ -412,14 +412,14 @@ export default function ListingDetailPage() {
                   <div className="grid grid-cols-2 gap-4">
                     {listing.floorAreaM2 && (
                       <div>
-                        <span className="text-sm font-medium text-gray-500">Floor Area</span>
-                        <p className="text-lg">{listing.floorAreaM2}m²</p>
+                        <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Floor Area</span>
+                        <p className="text-lg text-gray-900 dark:text-white">{listing.floorAreaM2}m²</p>
                       </div>
                     )}
                     {listing.landAreaM2 && (
                       <div>
-                        <span className="text-sm font-medium text-gray-500">Land Area</span>
-                        <p className="text-lg">{listing.landAreaM2}m²</p>
+                        <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Land Area</span>
+                        <p className="text-lg text-gray-900 dark:text-white">{listing.landAreaM2}m²</p>
                       </div>
                     )}
                   </div>
@@ -429,14 +429,14 @@ export default function ListingDetailPage() {
                   <div className="grid grid-cols-2 gap-4">
                     {listing.cv && (
                       <div>
-                        <span className="text-sm font-medium text-gray-500">CV</span>
-                        <p className="text-lg">${listing.cv.toLocaleString()}</p>
+                        <span className="text-sm font-medium text-gray-500 dark:text-gray-400">CV</span>
+                        <p className="text-lg text-gray-900 dark:text-white">${listing.cv.toLocaleString()}</p>
                       </div>
                     )}
                     {listing.rv && (
                       <div>
-                        <span className="text-sm font-medium text-gray-500">RV</span>
-                        <p className="text-lg">${listing.rv.toLocaleString()}</p>
+                        <span className="text-sm font-medium text-gray-500 dark:text-gray-400">RV</span>
+                        <p className="text-lg text-gray-900 dark:text-white">${listing.rv.toLocaleString()}</p>
                       </div>
                     )}
                   </div>
@@ -444,7 +444,7 @@ export default function ListingDetailPage() {
 
                 {listing.featuresJson && listing.featuresJson.length > 0 && (
                   <div>
-                    <span className="text-sm font-medium text-gray-500">Features</span>
+                    <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Features</span>
                     <div className="mt-2 flex flex-wrap gap-2">
                       {listing.featuresJson.map((feature, index) => (
                         <Badge key={index} variant="outline">
@@ -457,8 +457,8 @@ export default function ListingDetailPage() {
 
                 {listing.notes && (
                   <div>
-                    <span className="text-sm font-medium text-gray-500">Notes</span>
-                    <p className="text-sm mt-1 text-gray-600">{listing.notes}</p>
+                    <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Notes</span>
+                    <p className="text-sm mt-1 text-gray-600 dark:text-gray-300">{listing.notes}</p>
                   </div>
                 )}
 
@@ -468,16 +468,16 @@ export default function ListingDetailPage() {
             {/* Generated Copy - View Mode */}
             <Card>
               <CardHeader>
-                <CardTitle>Generated Copy</CardTitle>
+                <CardTitle className="text-gray-900 dark:text-white">Generated Copy</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
                   {/* Headlines */}
                   <div>
-                    <h4 className="font-medium mb-2">Headlines</h4>
+                    <h4 className="font-medium mb-2 text-gray-900 dark:text-white">Headlines</h4>
                     <div className="space-y-2">
                       {listing.variantsJson.headlines?.map((headline: string, index: number) => (
-                        <div key={index} className="p-2 bg-gray-50 rounded text-sm">
+                        <div key={index} className="p-2 bg-gray-50 dark:bg-gray-700 rounded text-sm text-gray-900 dark:text-white">
                           {headline}
                         </div>
                       ))}
@@ -487,9 +487,9 @@ export default function ListingDetailPage() {
                   {/* Standard Copy */}
                   {listing.variantsJson.standard && (
                     <div>
-                      <h4 className="font-medium mb-2">Standard Description (220 chars)</h4>
-                      <div className="p-4 bg-green-50 rounded">
-                        <p className="text-sm">{listing.variantsJson.standard}</p>
+                      <h4 className="font-medium mb-2 text-gray-900 dark:text-white">Standard Description (220 chars)</h4>
+                      <div className="p-4 bg-green-50 dark:bg-green-900/30 rounded">
+                        <p className="text-sm text-gray-900 dark:text-white">{listing.variantsJson.standard}</p>
                       </div>
                     </div>
                   )}
@@ -497,17 +497,17 @@ export default function ListingDetailPage() {
                   {/* Long Copy */}
                   {listing.variantsJson.long && (
                     <div>
-                      <h4 className="font-medium mb-2">Long Description (400 chars)</h4>
-                      <div className="p-4 bg-purple-50 rounded">
-                        <p className="text-sm">{listing.variantsJson.long}</p>
+                      <h4 className="font-medium mb-2 text-gray-900 dark:text-white">Long Description (400 chars)</h4>
+                      <div className="p-4 bg-purple-50 dark:bg-purple-900/30 rounded">
+                        <p className="text-sm text-gray-900 dark:text-white">{listing.variantsJson.long}</p>
                       </div>
                     </div>
                   )}
 
                   {/* Bullet Points */}
                   <div>
-                    <h4 className="font-medium mb-2">Key Features</h4>
-                    <ul className="list-disc list-inside space-y-1 text-sm">
+                    <h4 className="font-medium mb-2 text-gray-900 dark:text-white">Key Features</h4>
+                    <ul className="list-disc list-inside space-y-1 text-sm text-gray-900 dark:text-white">
                       {listing.variantsJson.bullets?.map((bullet: string, index: number) => (
                         <li key={index}>{bullet}</li>
                       ))}
@@ -517,15 +517,15 @@ export default function ListingDetailPage() {
                   {/* Social Content */}
                   {listing.variantsJson.social && (
                     <div>
-                      <h4 className="font-medium mb-2">Social Media</h4>
+                      <h4 className="font-medium mb-2 text-gray-900 dark:text-white">Social Media</h4>
                       <div className="space-y-2">
-                        <div className="p-2 bg-blue-50 rounded text-sm">
+                        <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded text-sm text-gray-900 dark:text-white">
                           <strong>Facebook:</strong> {listing.variantsJson.social.facebook}
                         </div>
-                        <div className="p-2 bg-pink-50 rounded text-sm">
+                        <div className="p-2 bg-pink-50 dark:bg-pink-900/30 rounded text-sm text-gray-900 dark:text-white">
                           <strong>Instagram:</strong> {listing.variantsJson.social.instagram}
                         </div>
-                        <div className="p-2 bg-blue-50 rounded text-sm">
+                        <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded text-sm text-gray-900 dark:text-white">
                           <strong>LinkedIn:</strong> {listing.variantsJson.social.linkedin}
                         </div>
                       </div>
