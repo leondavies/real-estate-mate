@@ -5,18 +5,19 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { Plus, User, LogOut, Settings, Home } from "lucide-react"
 
 export function Navbar() {
   const { data: session, status } = useSession()
 
   return (
-    <nav className="border-b bg-white">
+    <nav className="border-b bg-background">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/dashboard" className="flex items-center space-x-2">
-            <div className="font-bold text-xl text-blue-600">RealEstateMate</div>
+            <div className="font-bold text-xl text-blue-600 dark:text-blue-400">RealEstateMate</div>
           </Link>
 
           {/* Navigation */}
@@ -39,6 +40,7 @@ export function Navbar() {
 
           {/* User menu */}
           <div className="flex items-center space-x-4">
+            <ThemeToggle />
             {status === "loading" ? (
               <div className="h-8 w-8 rounded-full bg-gray-200 animate-pulse" />
             ) : session ? (
